@@ -1,0 +1,21 @@
+name: JSONRPC2
+on: [ push ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Test
+        run: make testc
+      - name: Coverage
+        run: |
+          coverage=$(go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+')
+          if (( $(echo "$coverage <= 80" | bc -l) )) ; then
+              echo "NOK: $coverage";
+              exit 1;
+          else
+              echo "OK: $coverage";
+          fi
